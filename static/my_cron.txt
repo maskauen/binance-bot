@@ -1,0 +1,4 @@
+# stoff
+# command to run me: 
+# crontab /home/ubuntu/binance-bot/static/my_cron.txt
+* * * * * /home/ubuntu/binance-bot/binance/delete_prices.py >> /home/ubuntu/runlog/binance.txt 2>&1

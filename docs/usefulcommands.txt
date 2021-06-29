@@ -1,0 +1,5 @@
+nohup streamlit run /home/ubuntu/binance-bot/v20/historic_app.py --server.baseUrlPath "historicapp" /home/ubuntu/log/app_output.log 2>&1 &
+
+
+
+
