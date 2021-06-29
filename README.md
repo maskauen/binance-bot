@@ -12,3 +12,7 @@ python -m venv v20\app
 pip install -r requirements.txt
 
 python .\v20\historic_app.py
+
+### Architecture
+
+![picture](docs/informationflow_architecture.png)
