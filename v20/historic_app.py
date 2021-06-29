@@ -81,26 +81,16 @@ def run_app():
     filepath = os.path.dirname(os.path.realpath(__file__)) + '/backtests/'+image_name.replace('/','')
     filepath_local = os.path.dirname(os.path.realpath(__file__)) + '\\backtests\\'+image_name.replace('/','')
     #try:
-    st.text(filepath)
-    figure.savefig(filepath)
+    st.text('image.png')
+    figure.savefig('image.png')
     #st.image('backetest/'+image_name.replace('/',''))
-    st.image(filepath)
+    st.image('image.png')
 
     #except:
     #    figure.savefig(filepath_local)
     #    st.image('backtests\\'+image_name.replace('/',''))
             
             
-    # Trades
-    try:
-        db_name = valuta.replace('/','')+'_'+timeframe
-        pg_object = postgres()
-        pg_object.open_connect()
-        data = pg_object.cache_trades(db_name)
-        pg_object.close_connect()
-        st.write(data)
-    except:
-        st.write("")
-        st.write(f"No trades exists for this strategy({valuta},{timeframe})")
+    
 
 run_app()

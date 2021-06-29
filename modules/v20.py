@@ -1,8 +1,6 @@
 
 #!/usr/bin/env python3
 import time, json, sys
-import psycopg2
-from configparser import ConfigParser
 import pandas as pd
 import numpy as np
 
@@ -10,7 +8,7 @@ static_path = "/home/ubuntu/binance-bot/static"
 local_path = r"C:\Users\mskauen\Documents\Projects\private\github\binance-bot\static"
 sys.path.append(static_path)
 sys.path.append(local_path)
-import config, postgres_commands
+import config
 
 import ta
 import slack
@@ -25,142 +23,6 @@ warnings.filterwarnings('ignore')
 from datetime import datetime
 
 
-class postgres():
-    def postgres_config(self, filename=config.postgres_filename, section=config.postgres_section):
-        # create a parser
-        parser = ConfigParser()
-        # read config file
-        parser.read(filename)
-
-        # get section, default to postgresql
-        db = {}
-        if parser.has_section(section):
-            params = parser.items(section)
-            for param in params:
-                db[param[0]] = param[1]
-        else:
-            raise Exception('Section {0} not found in the {1} file'.format(section, filename))
-
-        return db
-
-    def open_connect(self):
-        """ Connect to the PostgreSQL database server """
-        self.conn = None
-        try:
-            # read connection parameters
-            self.params = self.postgres_config()
-
-            # connect to the PostgreSQL server
-            print('Connecting to the PostgreSQL database...')
-            self.conn = psycopg2.connect(**self.params)
-               
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
-
-    def close_connect(self):
-        if self.conn is not None:
-            self.conn.close()
-            print('Database connection closed.')
-        else:
-            print('Database connection is not Open')
-
-    def insert_prices(self, sql_string, op, cl, hi, lo, timestamp):
-        price_id = None
-        try:
-            cur = self.conn.cursor()
-            cur.execute(sql_string, (timestamp,op,cl,hi,lo))
-            #price_id = cur.fetchone()[0]
-            self.conn.commit()
-            cur.close()
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
-        return timestamp
-
-    def insert_super_trend(self,df):
-        #clean = df.drop('index', 1)
-        
-        clean_list = list(zip(*map(clean.get, clean)))
-        for row in clean_list:
-            print(row)
-            print(postgres_commands.ccxt_sql_string)
-            input()
-            try:
-                cur = self.conn.cursor()
-                #cur.execute(ccxt_sql_string, (timestamp,op,cl,hi,lo))
-                cur.execute(postgres_commands.ccxt_sql_string, row)
-                self.conn.commit()
-                cur.close() 
-            except (Exception, psycopg2.DatabaseError) as error:
-                print(error)
-            return timestamp
-
-    def insert_trade(self,order_type,quantity,timestamp,name,close):
-        entry = (order_type,quantity,timestamp,close)
-        command = postgres_commands.trade_sql_string.replace('TABLE_NAME', name)
-        #print(command)
-        #print(entry)
-        #input()
-        #try:
-        cur = self.conn.cursor()
-        #cur.execute(ccxt_sql_string, (timestamp,op,cl,hi,lo))
-        #hits =  pd.read_sql('SELECT * FROM ethusd_1m',self.conn)
-        #print(hits)
-        #input()
-        cur.execute(command, entry)
-        self.conn.commit()
-        cur.close() 
-        #except (Exception, psycopg2.DatabaseError) as error:
-        #    print(error)
-    def create_bot_table(self,name):
-        command = postgres_commands.postgres_bot_table.replace('TABLE_NAME', name)
-        try:
-            cur = self.conn.cursor()
-            cur.execute(command)
-            cur.close()
-            self.conn.commit()
-        except (Exception, psycopg2.DatabaseError) as error:
-            print("table create error")
-            print(error)
-    def create_tables(self, ccxt=False):
-        commands = postgres_commands.postgres_table_commands
-        if ccxt == True:
-            commands = postgres_commands.ccxt_postgres_table_commands
-        try:
-            cur = self.conn.cursor()
-            for command in commands:
-                #try:
-                cur.execute(command)
-                #except:
-                #   print("failed")
-            cur.close()
-            self.conn.commit()
-        except (Exception, psycopg2.DatabaseError) as error:
-            print("here")
-            print(error)
-
-    def delete_prices(self, ccxt=False):
-        commands = postgres_commands.postgres_delete_command
-        if ccxt == True:
-            commands = postgres_commands.ccxt_postgres_delete_command        
-        try:
-            cur = self.conn.cursor()
-            cur.execute(commands)
-            cur.close()
-            self.conn.commit()
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
-
-    def cache_prices(self):
-        df = pd.read_sql(postgres_commands.postgres_cache_command, self.conn)
-        df.head()
-        return df
-        # https://stackoverflow.com/questions/57949871/how-to-set-get-pandas-dataframes-into-redis-using-pyarrow/57986261#57986261
-
-    def cache_trades(self,name):
-        command = postgres_commands.postgres_cache_trades.replace('TABLE_NAME',name)
-        df = pd.read_sql(command, self.conn)
-        df.head()
-        return df
 
 class slack_class():
     def connect(self):

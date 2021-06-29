@@ -1,7 +1,7 @@
 static/config.py
 v20/app/
 v20/backtests/
-
+image.png
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
